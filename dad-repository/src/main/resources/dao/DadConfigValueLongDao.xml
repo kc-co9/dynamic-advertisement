@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.share.co.kcl.dad.repository.dao.DadConfigValueLongDao">
+
+    <select id="selectConfigAttributeValue"
+            resultType="com.share.co.kcl.dad.repository.model.po.dos.ConfigAttributeValueSelectResult">
+        SELECT dad_config_attribute.id,
+               dad_config_attribute.key,
+               dad_config_attribute.name,
+               dad_config_attribute.description,
+               dad_config_attribute.create_time,
+               dad_config_metadata.value_type,
+               dad_config_metadata.value_range,
+               dad_config_metadata.format_rule,
+               dad_config_metadata.format_type,
+               dad_config_metadata.is_required,
+               dad_config_metadata.validated_rule,
+               dad_config_metadata.validated_type,
+               dad_config_value_long.value,
+               dad_config_value_long.is_null
+        FROM dad_config_value_long
+                 INNER JOIN dad_config_attribute
+                            ON dad_config_value_long.attribute_id = dad_config_attribute.id
+                 INNER JOIN dad_config_metadata
+                            on dad_config_value_long.attribute_id = dad_config_metadata.attribute_id
+        WHERE dad_config_value_long.config_id = #{params.configId}
+    </select>
+
+    <select id="selectMultiConfigAttributeValue"
+            parameterType="com.share.co.kcl.dad.repository.model.po.dos.MultiConfigAttributeValueSelectParams"
+            resultType="com.share.co.kcl.dad.repository.model.po.dos.MultiConfigAttributeValueSelectResult">
+        SELECT
+        dad_config.id AS configId,
+        dad_config_attribute.id,
+        dad_config_attribute.key,
+        dad_config_attribute.name,
+        dad_config_attribute.description,
+        dad_config_attribute.create_time,
+        dad_config_metadata.value_type,
+        dad_config_metadata.value_range,
+        dad_config_metadata.format_rule,
+        dad_config_metadata.format_type,
+        dad_config_metadata.is_required,
+        dad_config_metadata.validated_rule,
+        dad_config_metadata.validated_type,
+        dad_config_value_long.value,
+        dad_config_value_long.is_null
+        FROM dad_config_value_long
+        INNER JOIN dad_config ON dad_config_value_long.config_id = dad_config.id
+        INNER JOIN dad_config_attribute ON dad_config_value_long.attribute_id = dad_config_attribute.id
+        INNER JOIN dad_config_metadata ON dad_config_value_long.attribute_id = dad_config_metadata.attribute_id
+        <where>
+            <if test="params.configIdList != null and params.configIdList.size > 0">
+                AND dad_config.id IN
+                <foreach collection="params.configIdList" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="params.attributeIdList != null and params.attributeIdList.size > 0">
+                AND dad_config_attribute.id IN
+                <foreach collection="params.attributeIdList" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+</mapper>
+

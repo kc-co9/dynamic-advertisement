@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.share.co.kcl.dad.repository.dao.DadConfigAttributeDao">
+
+    <select id="selectConfigAttribute"
+            parameterType="com.share.co.kcl.dad.repository.model.po.dos.ConfigAttributeSelectParams"
+            resultType="com.share.co.kcl.dad.repository.model.po.dos.ConfigAttributeSelectResult">
+        SELECT
+        dad_config_attribute.id,
+        dad_config_attribute.key,
+        dad_config_attribute.name,
+        dad_config_attribute.description,
+        dad_config_attribute.create_time,
+        dad_config_attribute.update_time,
+        dad_config_metadata.value_type,
+        dad_config_metadata.value_limit,
+        dad_config_metadata.value_range,
+        dad_config_metadata.format_rule,
+        dad_config_metadata.format_type,
+        dad_config_metadata.is_required,
+        dad_config_metadata.validated_rule,
+        dad_config_metadata.validated_type
+        FROM dad_config_attribute
+        INNER JOIN dad_config_metadata ON dad_config_attribute.id = dad_config_metadata.attribute_id
+        <where>
+            <if test="params.attributeId != null">
+                AND dad_config_attribute.id = #{params.attributeId}
+            </if>
+            <if test="params.attributeIdList != null and params.attributeIdList.size > 0">
+                AND dad_config_attribute.id IN
+                <foreach collection="params.attributeIdList" index="index" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="params.attributeKey != null and params.attributeKey != ''">
+                AND dad_config_attribute.key = #{params.attributeKey}
+            </if>
+            <if test="params.attributeName != null and params.attributeName != ''">
+                AND dad_config_attribute.name = #{params.attributeName}
+            </if>
+        </where>
+        ORDER BY dad_config_attribute.id DESC
+    </select>
+
+</mapper>
+
